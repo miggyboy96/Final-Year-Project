@@ -75,5 +75,5 @@ snp <- snp[-which(rowSums(snp[, -1] == 1) > threshold),]
 variables <- c('snp', 'expr', 'snpid', 'geneid', 'sampleid', 'geneloc', 'snpsloc')
 save(list=variables, file = "Data/cleaned_data.rda")
 for (x in variables){
-  write.table(get(x),file = paste("Data/",x,".txt"), sep = "\t", row.names = F)
+  write.table(get(x),file = paste0("Data/",x,".txt"), sep = "\t", row.names = F)
 }

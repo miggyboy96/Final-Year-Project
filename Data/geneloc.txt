@@ -1,4 +1,4 @@
-"geneid"	"chrom"	"pos_start"	"pos_end"
+"geneid"	"chr"	"left"	"right"
 "AT1G01010"	"1"	3631	5899
 "AT1G01020"	"1"	5928	8737
 "AT1G01030"	"1"	11649	13714
