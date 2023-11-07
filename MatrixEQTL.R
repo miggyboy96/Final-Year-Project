@@ -87,5 +87,9 @@ unlink(output_file_name_tra);
 unlink(output_file_name_cis)
 
 
+## Saving variables to .rda ##
+cis_output <- read.table("Data/cis_output.txt", header=T)
+trans_output <- read.table("Data/trans_output.txt", header=T)
 
-
+variables <- append(variables, c('cis_output', 'trans_output'))
+save(list=variables, file="data.rda")
