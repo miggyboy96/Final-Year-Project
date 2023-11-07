@@ -29,7 +29,7 @@ geneloc <- tair10_gff %>%
   select(Chr = V1, left = V4, right = V5, geneid = V9)
 geneloc$geneid <- sub(".*Name=", "", geneloc$geneid)
 
-# Manipulate chromosome data to use consistent naming
+## Manipulate chromosome data to use consistent naming
 conversion_table <- data.frame(
   OriginalValue = c("Chr1", "Chr2", "Chr3", "Chr4", "Chr5", "ChrC", "ChrM"),
   chr = c("1", "2", "3", "4", "5", "Pt", "Mt")
@@ -51,7 +51,7 @@ snpsloc <- data.frame(
 snp <- S11 %>% select(-one_of(c("#CHROM","FILTER", "INFO", "FORMAT" ,"POS", "QUAL", "ID", "REF", "ALT")))
 snp <- cbind(snpid, snp)         
 
-# Converting genotype data
+## Converting genotype data
 for (i in 1:nrow(snp)){
   for (j in 2:ncol(snp)){
     if (snp[i,j] == "0|0"){
@@ -67,13 +67,13 @@ for (i in 1:nrow(snp)){
 }
 snp[,-1] <- as.data.frame(sapply(snp[,-1], as.numeric))
 
-# Removing snps heterozygous across nearly all samples
+## Removing snps heterozygous across nearly all samples
 threshold = length(sampleid) - 2  # if heterozygous in all but 2 samples
 snp <- snp[-which(rowSums(snp[, -1] == 1) > threshold),]
 
 #### Saving and writing data ####
-variables <- list(geneid=geneid, sampleid=sampleid, snpid=snpid, expr=expr, snp=snp, geneloc=geneloc, snpsloc=snpsloc)
-save(variables, file = "Data/cleaned_data.rda")
-for (x in names(variables)){
-  write.table(variables[[x]],file = paste("Data/",x,".txt"), sep = "\t", row.names = F)
+variables <- c('snp', 'expr', 'snpid', 'geneid', 'sampleid', 'geneloc', 'snpsloc')
+save(list=variables, file = "Data/cleaned_data.rda")
+for (x in variables){
+  write.table(get(x),file = paste("Data/",x,".txt"), sep = "\t", row.names = F)
 }
