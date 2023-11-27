@@ -8,7 +8,7 @@
 
 <h2>Installation</h2>
 1. Download this project as zip and extract it.
-2. Import project file `project.Rproj` into RStudio (or `setwd(path_to_proj_folder)` if you don't want to use Rproj files)
+2. Open project file `project.Rproj` in RStudio (or `setwd(path_to_proj_folder)` if you don't want to use Rproj files)
 
 <h2>Contents</h2>
 List of directories and files along with a brief description.
