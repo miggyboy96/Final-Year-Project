@@ -1,4 +1,4 @@
-## grn_effect.R
+## cluster.analysis.R
 ## Miguel Alburo
 ## 26/11/2023
 ## Analysis of significant eQTLs with high connection to regulatory genes in the GRN.
