@@ -1,5 +1,5 @@
 load('data/processed_data.Rda')
-load('data/output_me.Rda')
+load('../results/output_me.Rda')
 
 
 

@@ -11,7 +11,7 @@
 
 ## Loading data
   load(file = 'data/processed_data.Rda')
-  load(file = 'data/output_me.Rda')
+  load(file = '../results/output_me.Rda')
 
 ## Importing GRN data
   gene_regulatory_network <- read_excel(path = 'data/raw/media-10.xlsx') # Downloaded from bioRxiv's Supplementary Materials
@@ -38,6 +38,27 @@
     logp <- -log(subset_output_eqtl$p.value[i], base = 10)
     adj_mat[gene,snp] <- logp
   }
+  colnames(adj_mat) <- mapply(paste,colnames(adj_mat),snp_to_gene[colnames(adj_mat)])
 
 ## Printing the heatmap
-  grn_effect_pheatmap <- pheatmap(mat = adj_mat, color = magma(n = 80))
+  xlabel <- mapply(paste,colnames(adj_mat),rep("(",length(colnames(adj_mat))),snp_to_gene[colnames(adj_mat)],rep(")",length(colnames(adj_mat))))
+  grn_effect_pheatmap <- pheatmap(mat = adj_mat, labels_col = xlabel, color = magma(n = 80))
+
+## Reordering snps based on heatmap
+  connected_snps <- colnames(adj_mat[,grn_effect_pheatmap$tree_col[["order"]]])
+
+## Extract clusters based on height of heirarchy
+  plot(grn_effect_pheatmap$tree_col)
+  abline(h=30, col="red", lty=2, lwd=2) # height = 30
+  clusters <- sort(cutree(grn_effect_pheatmap$tree_col, h=30))
+
+## Saving variables
+  for (x in 1:max(clusters)){
+    snpid <- names(which(clusters==x)) # Creates a vector list of snps in cluster x
+    geneid <- snp_to_gene[snps]
+    name <- paste0("results/cluster_",x,".csv")
+    write.csv(cbind(snpid,geneid,file = )
+
+  }
+
+

@@ -69,7 +69,7 @@
   gt <- gt[-which(rowSums(gt[, -1] == 1) > threshold),]
 
 ## Creating a conversion table between snp and geneid
-  source(file = 'code/functions.R')
+  source('code/functions.R')
   snp_to_gene <- mapply(pos.to.gene, snpsloc$pos, snpsloc$chr)
   names(snp_to_gene) <- snpsloc$snpid
 

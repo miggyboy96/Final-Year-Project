@@ -7,3 +7,4 @@
 "sampleid"
 "geneloc"
 "snpsloc"
+"snp_to_gene"

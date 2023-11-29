@@ -5,9 +5,6 @@
 
 ## Load packages
   library("MatrixEQTL") # http://www.bios.unc.edu/research/genomic_software/Matrix_eQTL/
-
-## Import processed data
-  load("data/processed_data.Rda")
   
 ## Preparing for analysis
   # Linear model to use. Either modelLINEAR, modelANOVA or modelLINEAR_CROSS
@@ -21,8 +18,8 @@
   # Covariates file name. Set to character() for no covariates
     covariates_file_name <- character()
   # Output file name
-    output_file_name_cis <- "data/cis-output_me.txt"
-    output_file_name_tra <- "data/trans-output_me.txt"
+    output_file_name_cis <- "../results/cis-output_me.txt"
+    output_file_name_tra <- "../results/trans-output_me.txt"
   # Only associations significant at this level will be saved
     pvOutputThreshold_cis <- 2e-2
     pvOutputThreshold_tra <- 1e-2
@@ -76,7 +73,8 @@
 
 
 ## Saving variables to .Rda
-  output_eqtl_cis <- read.table(file = "data/cis-output_me.txt", header = T)
-  output_eqtl_trans <- read.table(file = "data/trans-output_me.txt", header = T)
+  output_eqtl_cis <- read.table(file = "results/cis-output_me.txt", header = T)
+  output_eqtl_trans <- read.table(file = "results/trans-output_me.txt", header = T)
   output_eqtl <- rbind(output_eqtl_cis,output_eqtl_trans)
-  save(list = c('output_eqtl', 'output_eqtl_cis', 'output_eqtl_trans'), file = "data/output_me.Rda")
+  save(list = c('output_eqtl', 'output_eqtl_cis', 'output_eqtl_trans'), file = "results/output_me.Rda")
+  rm(list=ls())
