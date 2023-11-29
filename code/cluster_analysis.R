@@ -11,7 +11,7 @@
 
 ## Loading data
   load(file = 'data/processed_data.Rda')
-  load(file = '../results/output_me.Rda')
+  load(file = 'results/output_me.Rda')
 
 ## Importing GRN data
   gene_regulatory_network <- read_excel(path = 'data/raw/media-10.xlsx') # Downloaded from bioRxiv's Supplementary Materials
@@ -38,7 +38,6 @@
     logp <- -log(subset_output_eqtl$p.value[i], base = 10)
     adj_mat[gene,snp] <- logp
   }
-  colnames(adj_mat) <- mapply(paste,colnames(adj_mat),snp_to_gene[colnames(adj_mat)])
 
 ## Printing the heatmap
   xlabel <- mapply(paste,colnames(adj_mat),rep("(",length(colnames(adj_mat))),snp_to_gene[colnames(adj_mat)],rep(")",length(colnames(adj_mat))))
@@ -55,10 +54,9 @@
 ## Saving variables
   for (x in 1:max(clusters)){
     snpid <- names(which(clusters==x)) # Creates a vector list of snps in cluster x
-    geneid <- snp_to_gene[snps]
-    name <- paste0("results/cluster_",x,".csv")
-    write.csv(cbind(snpid,geneid,file = )
-
+    geneid <- snp_to_gene[snpid]
+    filename <- paste0("results/cluster_",x,".csv")
+    write.csv(cbind(snpid,geneid),file = filename)
   }
 
 
