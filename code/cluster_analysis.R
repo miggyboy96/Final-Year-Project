@@ -50,13 +50,18 @@
   plot(grn_effect_pheatmap$tree_col)
   abline(h=30, col="red", lty=2, lwd=2) # height = 30
   clusters <- sort(cutree(grn_effect_pheatmap$tree_col, h=30))
+  cluster_dendrogram <- recordPlot
 
-## Saving variables
+## Write snp lists to .csv files
   for (x in 1:max(clusters)){
     snpid <- names(which(clusters==x)) # Creates a vector list of snps in cluster x
     geneid <- snp_to_gene[snpid]
     filename <- paste0("results/cluster_",x,".csv")
-    write.csv(cbind(snpid,geneid),file = filename)
+    write.csv(cbind(snpid,geneid),file = filename, row.names = F)
   }
+
+## Saving variables
+  save(list = c('regulatory_genes', 'connected_snps', 'clusters', 'grn_effect_pheatmap', 'cluster_dendrogram'),
+       file = 'results/output_cluster.Rda')
 
 
