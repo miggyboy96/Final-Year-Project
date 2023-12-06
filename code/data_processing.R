@@ -73,8 +73,14 @@
   snp_to_gene <- mapply(pos.to.gene, snpsloc$pos, snpsloc$chr)
   names(snp_to_gene) <- snpsloc$snpid
 
+## Transposed versions of data frames
+  gt_trans <- as.data.frame(t(gt[,-1]))
+  colnames(gt_trans) <- gt$snpid
+  expr_trans <- as.data.frame(t(expr[,-1]))
+  colnames(expr_trans) <- expr$geneid
+
 ## Saving and writing data
-  variables <- unique(c('variables','gt', 'expr', 'snpid', 'geneid', 'sampleid', 'geneloc', 'snpsloc','snp_to_gene'))
+  variables <- unique(c('variables','gt', 'gt_trans', 'expr', 'expr_trans', 'snpid', 'geneid', 'sampleid', 'geneloc', 'snpsloc','snp_to_gene'))
   save(list=variables, file = "data/processed_data.Rda")
   for (x in variables){
     write.table(get(x),file = paste0("data/",x,".txt"), sep = "\t", row.names = F)
