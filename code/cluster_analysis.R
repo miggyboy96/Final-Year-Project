@@ -51,10 +51,11 @@ regulatory_genes <- rownames(adj_mat[grn_effect_pheatmap$tree_row[['order']],])
 plot(grn_effect_pheatmap$tree_col, main = 'Variant Cluster Dendrogram')
 abline(h=30, col="red", lty=2, lwd=2) # height = 30
 snp_clusters <- sort(cutree(grn_effect_pheatmap$tree_col, h=30))
-snp_cluster_dendrogram <- recordPlot
+snp_cluster_dendrogram <- recordPlot()
 plot(grn_effect_pheatmap$tree_row, main = 'Regulatory Gene Cluster Dendrogram')
 abline(h=40, col="red", lty=2, lwd=2)
 gene_clusters <- sort(cutree(grn_effect_pheatmap$tree_row, h=40))
+gene_cluster_dendrogram <- recordPlot()
 
 ## Write snp and gene lists to .csv files
 for (x in 1:max(snp_clusters)){
@@ -65,12 +66,12 @@ for (x in 1:max(snp_clusters)){
 }
 for (y in 1:max(gene_clusters)){
   geneid <- names(which(gene_clusters==y))
-  filename <- paste0('results/clusters/variant_cluster_',y,'.csv')
+  filename <- paste0('results/clusters/gene_cluster_',y,'.csv')
   write.csv(geneid, file = filename, row.names = F)
 }
 
 ## Saving variables
-save(list = c('regulatory_genes', 'connected_snps', 'clusters', 'grn_effect_pheatmap', 'cluster_dendrogram'),
-     file = 'results/output_cluster.Rda')
+save(list = c('regulatory_genes', 'connected_snps', 'gene_clusters', 'snp_clusters', 'grn_effect_pheatmap', 'gene_cluster_dendrogram', 'snp_cluster_dendrogram'),
+     file = 'results/clusters/output_cluster.Rda')
 
 
