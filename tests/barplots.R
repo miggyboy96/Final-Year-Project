@@ -7,7 +7,8 @@ library(tidyr)
 library(ggplot2)
 
 ## Datasets
-load(file = 'data/processed_data.Rda')
+load(file = 'data/processed_data.Rda')#
+source(file =  'code/functions.R')
 
 ## Transposed versions of datasets
 gt_trans <- data.frame(t(gt[,-1]))
@@ -20,8 +21,9 @@ expr_trans <- tibble::rownames_to_column(expr_trans, 'sample')
 
 geno_long <- tidyr::gather(data = gt_trans, key = 'snp', value = 'genotype', -sample)
 expr_long <- tidyr::gather(data = expr_trans, key = 'gene', value = 'expression', -sample)
-data_long <- cbind(geno_long, expr_long["expression"])
+
 
 
 snps <- gt$snpid[9:18]
 genes <- expr$geneid[9:18]
+snp.vs.gene(snps,genes)
