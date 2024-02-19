@@ -17,14 +17,13 @@ snp.vs.gene <- function(snps,genes){
   }
   data_long$comparison <- paste(data_long$snp,"vs.",data_long$gene)
   data_long$genotype <- as.factor(data_long$genotype)
+  lm_model <- lm(data_long$expression ~ data_long$genotype)
   ggplot(data_long, aes(genotype, expression)) +
-    geom_jitter(col="darkorange", position=position_jitter(width=0.25)) +
-    geom_boxplot(outlier.size=0, alpha=0.6, fill="steelblue") +
+    geom_jitter(col="darkorange", alpha = 0.8, position=position_jitter(width=0.1)) +
+    #geom_boxplot(outlier.size=0, alpha=0.6, fill="steelblue") +
+    facet_grid(~comparison) +
     geom_smooth(method = 'lm', linewidth=1,col="darkred", aes(group=1), se=FALSE) +
-    facet_wrap(~comparison) 
+    stat_cor(aes(group = 1,label =  paste(..p.label.., ..rr.label.., sep = "~~~~")))
 }
-geom_sm
-
-
 
         

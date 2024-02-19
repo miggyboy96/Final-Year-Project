@@ -1,4 +1,4 @@
-## eqtl_analysis.R
+## 2_eqtl_analysis.R
 ## Miguel Alburo
 ## 25/11/2023
 ## Performing eQTL analysis using MatrixEQTL 
@@ -26,7 +26,7 @@ pvOutputThreshold_tra <- 1e-2
 # Error covariance matrix. Set to numeric() for identity.
 errorCovariance <- numeric()
 # Distance for local gene-SNP pairs
-cisDist <- 1e6
+cisDist <- 1e6 # Wihin 1 Megabase
 ## Load genotype data
 snps <- SlicedData$new()
 snps$fileDelimiter <- "\t" # the TAB character
@@ -71,10 +71,28 @@ me <- Matrix_eQTL_main(
 # unlink(output_file_name_tra)
 # unlink(output_file_name_cis)
 
-
-## Saving variables to .Rda
+# Reading Matrix_EQTL results
 output_eqtl_cis <- read.table(file = "results/cis-output_me.txt", header = T)
 output_eqtl_trans <- read.table(file = "results/trans-output_me.txt", header = T)
+merge_output_eqtl <- rbind(output_eqtl_cis,output_eqtl_trans)
 output_eqtl <- rbind(output_eqtl_cis,output_eqtl_trans)
-save(list = c('output_eqtl', 'output_eqtl_cis', 'output_eqtl_trans'), file = "results/output_me.Rda")
+
+## Selection
+# Importing GRN data
+gene_regulatory_network <- read_excel(path = 'data/raw/media-10.xlsx') # Downloaded from bioRxiv's Supplementary Materials
+
+# Focusing Regulatory Genes
+regulatory_genes <- unique(gene_regulatory_network$`regulatory gene`)
+output_eqtl <- output_eqtl[which(output_eqtl$gene %in% regulatory_genes),] # Subset results for regulatory genes
+
+# Number of Regulatory Genes targetted by the eQTLs
+snp_table<- table(output_eqtl$SNP) # Tables number of regulatory genes each snp is associated with
+snp_table <- snp_table[order(-snp_table)] # Descending order
+
+# Select highly connected SNPs
+connected_snps <- unlist(dimnames(snp_table[1:100])) # 100 most connected snps
+output_eqtl <- output_eqtl[which(output_eqtl$SNP %in% connected_snps),] # Subset for connected snps
+
+## Saving variables to .Rda
+save(list = c('output_eqtl', 'output_eqtl_cis', 'output_eqtl_trans', 'regulatory_genes','connected_snps','snp_table'), file = "results/output_me.Rda")
 rm(list=ls())
