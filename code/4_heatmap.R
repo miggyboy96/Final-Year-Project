@@ -8,31 +8,43 @@ library(readxl) # Reading excel spreadsheets .xlsx
 library(dplyr)  # Data manipulation tools.
 library(pheatmap) # Heatmap vizualisation.
 library(viridis)  # Heatmap visualization, colors.
+library(RColorBrewer) # Heatmap colours
 
 ## Loading data
 load(file = 'data/processed_data.Rda')
 load(file = 'results/output_me.Rda')
+load(file = 'results/volcano.Rda')
+
+# List of variants and genes
+snplist <- unique(sigres$SNP)
+genelist <- unique(sigres$gene)
 
 ## Constructing an adjacency matrix
 adj_mat <- matrix(
-  data = 0,
-  dimnames = list(regulatory_genes, connected_snps),
-  nrow = length(regulatory_genes), ncol = length(connected_snps)
+  data = 3.7,
+  dimnames = list(genelist, snplist),
+  nrow = length(genelist), ncol = length(snplist)
 )
-for (i in seq(nrow(output_eqtl))){
-  snp <- output_eqtl$SNP[i]
-  gene <- output_eqtl$gene[i]
-  logp <- -log(output_eqtl$p.value[i], base = 10)
-  adj_mat[gene,snp] <- logp
+for (i in seq(nrow(sigres))){
+  snp <- sigres$SNP[i]
+  gene <- sigres$gene[i]
+  pi <- sigres$log2FC[i]
+  adj_mat[gene,snp] <- pi
 }
+
+## Color palette
+cool <- rainbow(50, start=rgb2hsv(col2rgb('cyan'))[1], end=rgb2hsv(col2rgb('blue'))[1])
+warm <- rainbow(50, start=rgb2hsv(col2rgb('red'))[1], end=rgb2hsv(col2rgb('yellow'))[1])
+cols <- c(rev(cool), rev(warm),"gray", "gray")
+mypalette <- colorRampPalette(cols)(255)
 
 ## Printing the heatmap
 xlabel <- mapply(paste,colnames(adj_mat),rep("(",length(colnames(adj_mat))),snp_to_gene[colnames(adj_mat)],rep(")",length(colnames(adj_mat))))
-grn_effect_pheatmap <- pheatmap(mat = adj_mat, labels_col = xlabel, color = magma(n = 80))
+grn_effect_pheatmap <- pheatmap(mat = adj_mat, labels_col = xlabel, color = mypalette)
 
 ## Reordering snps and genes based on heatmap
-connected_snps <- colnames(adj_mat[,grn_effect_pheatmap$tree_col[["order"]]])
-regulatory_genes <- rownames(adj_mat[grn_effect_pheatmap$tree_row[['order']],])
+sigvariants <- colnames(adj_mat[,grn_effect_pheatmap$tree_col[["order"]]])
+regulatorygenes <- rownames(adj_mat[grn_effect_pheatmap$tree_row[['order']],])
 
 ## Extract variant and gene clusters based on height of heirarchy
 plot(grn_effect_pheatmap$tree_col, main = 'Variant Cluster Dendrogram')
@@ -58,7 +70,7 @@ for (y in 1:max(gene_clusters)){
 }
 
 ## Saving variables
-save(list = c('regulatory_genes', 'connected_snps', 'gene_clusters', 'snp_clusters', 'grn_effect_pheatmap', 'gene_cluster_dendrogram', 'snp_cluster_dendrogram'),
+save(list = c('gene_clusters', 'snp_clusters', 'grn_effect_pheatmap', 'gene_cluster_dendrogram', 'snp_cluster_dendrogram'),
      file = 'results/clusters/output_cluster.Rda')
 
 

@@ -5,6 +5,7 @@
 ## Packages
 library(tidyr)
 library(ggplot2)
+library(ggpubr)
 
 ## Datasets
 load(file = 'data/processed_data.Rda')

@@ -26,4 +26,25 @@ snp.vs.gene <- function(snps,genes){
     stat_cor(aes(group = 1,label =  paste(..p.label.., ..rr.label.., sep = "~~~~")))
 }
 
+calclog2FC <- function(snp, gene){
+  # Extract expression values for the gene
+  gene_expr <- expr[expr$geneid == gene, ]
+  # Extract genotype values for the SNP
+  variant_genotype <- gt[gt$snpid == snp, ]
+  # Ensure matching samples between expression and genotype data
+  common_samples <- intersect(names(gene_expr), names(variant_genotype))
+  gene_expr <- gene_expr[common_samples]
+  variant_genotype <- variant_genotype[common_samples]
+   # Group expression values by genotype (0 vs 1 or 2)
+  expr_genotype_before <- gene_expr[variant_genotype == min(variant_genotype)]
+  expr_genotype_after <- gene_expr[variant_genotype == max(variant_genotype)] # either 1 or 2
+  # Calculate average expression for each genotype group
+
+  avg_expr_genotype_before <- mean(expr_genotype_before, na.rm = TRUE)
+  avg_expr_genotype_after <- mean(expr_genotype_after, na.rm = TRUE)
+  # Calculate log2 fold change
+  log2fc <- log2(avg_expr_genotype_after / avg_expr_genotype_before)
+  return(log2fc)
+}
+
         
