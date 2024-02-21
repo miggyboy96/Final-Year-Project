@@ -1,7 +1,7 @@
-## cluster.analysis.R
+## 4_heatmap.R
 ## Miguel Alburo
-## 26/11/2023
-## Analysis of significant eQTLs with high connection to regulatory genes in the GRN.
+## 20/02/2023
+## cluster analysis of eQTL results
 
 ## Load packages
 library(readxl) # Reading excel spreadsheets .xlsx
