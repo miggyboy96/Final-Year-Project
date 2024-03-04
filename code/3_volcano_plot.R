@@ -55,14 +55,14 @@ EnhancedVolcano(res,
   x = 'log2FC',
   y = 'FDR',
   title = 'MatrixEQTL results',
-  pCutoff = 10e-6,
+  pCutoff = 1e-6,
   FCcutoff = 1,
   pointSize = 3.0,
   labSize = 6.0)
 
 # Subset res based on volcano thresholds
 sigres <- res %>%
-  filter((log2FC>1 | log2FC < -1) & FDR < 10e-6)
+  filter((log2FC>1 | log2FC < -1) & FDR < 1e-6)
 length(unique(sigres$SNP)) # 76 variants
 length(unique(sigres$gene)) # 20 genes
 # Save variables

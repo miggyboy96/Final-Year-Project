@@ -21,8 +21,8 @@ covariates_file_name <- character()
 output_file_name_cis <- "results/cis-output_me.txt"
 output_file_name_tra <- "results/trans-output_me.txt"
 # Only associations significant at this level will be saved
-pvOutputThreshold_cis <- 2e-2
-pvOutputThreshold_tra <- 1e-2
+pvOutputThreshold_cis <- 0.05
+pvOutputThreshold_tra <- 0.05
 # Error covariance matrix. Set to numeric() for identity.
 errorCovariance <- numeric()
 # Distance for local gene-SNP pairs
