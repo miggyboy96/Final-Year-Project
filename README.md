@@ -21,9 +21,10 @@ The raw and processed/output data.
 
 - <h3>`/code/`</h2>
 Collection of scripts for the data analysis and visualization.
-  - `data_processing.R`- Processing raw data from the supplementary materials into forms suitable for analyses.
-  - `eqtl_analysis.R`- Performing eQTL analysis using MatrixEQTL 
-  - `cluster_analysis`- Analysis of significant eQTLs with high connection to regulatory genes in the GRN.
+  - `1_data_processing.R`- Processing raw data from the supplementary materials into forms suitable for analyses.
+  - `2_matrixeqtl.R`- Performing eQTL analysis using MatrixEQTL 
+  - `3_volcano_plot`- Volcano plot of differentially expressed genes caused by genetic variants.
+  - `4_heatmap.R`- Heatmap showing 
 - <h3>`/test/`</h2>
 Test scripts and outputs. Ignore.
 
