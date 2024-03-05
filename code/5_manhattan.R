@@ -1,6 +1,6 @@
 ## 4_expression_heatmap.R
 ## Miguel Alburo
-## 20/02/2023
+## 20/02/2024
 ## cluster analysis of eQTL results
 
 ## Packages
@@ -23,9 +23,12 @@ gene2Manhattan <- function(genename){
   return(ManhattanData)
 }
 
-testy <- gene2Manhattan("AT4G32800")
-# Function to create Manhattan Plot
-myManhattan(testy,col = brewer.pal(8, "Dark2"),suggestiveline = FALSE, genomewideline = 10e-6, highlight = intersect(unique(sigres$SNP), unique(testy$SNP)), point.size = 3, label.snps = intersect(unique(sigres$SNP), unique(testy$SNP)))
-#
+manplots <- sapply(unique(sigres$gene),
+                   function(g) {
+                     longdata <- gene2Manhattan(g)
+                     myManhattan(longdata,graph.title = g,col = brewer.pal(8, "Dark2"),suggestiveline = FALSE, genomewideline = 10e-6, highlight = intersect(unique(sigres$SNP), unique(longdata$SNP)), point.size = 3, label.snps = intersect(unique(sigres$SNP), unique(longdata$SNP)))
+                   }, simplify = FALSE)
 
-myManhattan(testy, highlight = 1e-6, point.size = 3)
+for (plt in seq_along(manplots)){
+  print(manplots[plt])
+}

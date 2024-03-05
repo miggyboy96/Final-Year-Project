@@ -179,12 +179,25 @@ myManhattan <- function(df, graph.title = "", highlight = NULL, highlight.col = 
 
     # Add labels to the plot using ggrepel
     g <- g + geom_text_repel(data = label.data,
-                             aes(x = BP, y = -log10(P), label = SNP),
-                              font.size = 5)
+                             aes(x = BP, y = -log10(P), label = SNP))
 #, box.padding = 0.35, point.padding = 0.5, segment.color = 'grey50')
   }
 
   return(g)
 }
 
-        
+getChromosome <- function(region) {
+  if (region >= 1 && region <= 31) {
+    1
+  } else if (region >= 32 && region <= 51) {
+    2
+  } else if (region >= 53 && region <= 75) {
+    3
+  } else if (region >= 76 && region <= 94) {
+    4
+  } else if (region >= 95 && region <= 121) {
+    5
+  } else {
+    NA  # For regions outside the specified range
+  }
+}
