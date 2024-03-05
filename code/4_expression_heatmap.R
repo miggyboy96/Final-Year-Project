@@ -1,4 +1,4 @@
-## 4_heatmap.R
+## 4_expression_heatmap.R
 ## Miguel Alburo
 ## 20/02/2023
 ## cluster analysis of eQTL results
@@ -21,7 +21,7 @@ genelist <- unique(sigres$gene)
 
 ## Constructing an adjacency matrix
 adj_mat <- matrix(
-  data = 3.7,
+  data = 0,
   dimnames = list(genelist, snplist),
   nrow = length(genelist), ncol = length(snplist)
 )
@@ -35,7 +35,7 @@ for (i in seq(nrow(sigres))){
 ## Color palette
 cool <- rainbow(50, start=rgb2hsv(col2rgb('cyan'))[1], end=rgb2hsv(col2rgb('blue'))[1])
 warm <- rainbow(50, start=rgb2hsv(col2rgb('red'))[1], end=rgb2hsv(col2rgb('yellow'))[1])
-cols <- c(rev(cool), rev(warm),"gray", "gray")
+cols <- c(rev(cool), "snow2", "snow2", rev(warm))
 mypalette <- colorRampPalette(cols)(255)
 
 ## Printing the heatmap

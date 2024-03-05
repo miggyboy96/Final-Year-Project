@@ -67,4 +67,3 @@ length(unique(sigres$SNP)) # 76 variants
 length(unique(sigres$gene)) # 20 genes
 # Save variables
 save(list = c('res', 'sigres', 'regulatorygenes'), file = "results/volcano.Rda")
-rm(list=ls())
