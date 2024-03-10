@@ -6,6 +6,12 @@
 # Packages
 library(tidyverse)
 
+# Load Data
+load(file = "results/output_me.Rda")
+load(file = "data/processed_data.Rda")
+load(file = "results/volcano.Rda")
+source(file = "code/functions.R")
+
 # gene | Mb region | frequency
 
 # 1. For a given gene, returns a vector of significant SNP
@@ -54,10 +60,25 @@ tallydata <- sapply(genelist, function(x){
   return(tallys)
 })
 
+control_genome <- table(loci2region(positionSNP(snpid)))
+control_genome <- control_genome * (mean(sapply(tallydata,mean)) / mean(control_genome)) * 1.1 # Rescale
+tallydata$'Genome (Normalised)' <- control_genome
+
+# Position of regulatory genes
+genepos <- geneloc %>%
+  select(-right) %>%
+  filter(geneid %in% genelist) %>%
+  rename(pos = left)
+generegions <- genepos %>%
+  mutate(region = loci2region(genepos)) %>%
+  select(geneid, region) %>%
+  rename(gene = geneid)
+
+
 tally_matrix <- matrix(
   data = 0,
-  dimnames = list(genelist, regionsdata$MbRegionLabel),
-  nrow = length(genelist), ncol = 121
+  dimnames = list(names(tallydata), regionsdata$MbRegionLabel),
+  nrow = length(tallydata), ncol = 121
 )
 
 for (gene in seq_along(tallydata)){
@@ -82,7 +103,8 @@ tally_long$count <- as.integer(tally_long$count)
 
 ggplot(tally_long, aes(x = region, y = gene, fill = count)) +
   geom_tile(color = "gray90", alpha = 1) +  # This creates the heatmap tiles
-  scale_fill_gradient(low = "white", high = "blue") +  # Adjust colors as needed
+  geom_tile(data = generegions, color = "red", fill = NA) +
+  scale_fill_gradient(low = "white", high = "blue", breaks = seq(10,0,-5), limits = c(0,10), guide = "colorbar") +  # Adjust colors as needed
   theme(
     #bold font for legend text
     legend.text=element_text(face="bold"),
@@ -100,8 +122,3 @@ ggplot(tally_long, aes(x = region, y = gene, fill = count)) +
                      labels = 1:5) +
   theme_minimal() +
   labs(x = "Chromosome", y = "Regulatory Gene", fill = "SNP frequency")  # Adjust axis labels as needed
-adj_matrix_long <- tally_long %>%
-  mutate(chr = cut(as.numeric(region), breaks = seq(0, 121, by = 10),
-                     labels = paste(seq(1, 12, by = 1),
-                                    seq(10, 120, by = 10), sep = "-"),
-                     include.lowest = TRUE))

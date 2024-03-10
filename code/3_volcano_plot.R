@@ -63,7 +63,15 @@ EnhancedVolcano(res,
 # Subset res based on volcano thresholds
 sigres <- res %>%
   filter((log2FC>1 | log2FC < -1) & FDR < 1e-6)
-length(unique(sigres$SNP)) # 76 variants
-length(unique(sigres$gene)) # 20 genes
+length(unique(sigres$SNP)) # 58 variants
+length(unique(sigres$gene)) # 19 variants
+
+# Write to csv
+sigvariants <- as.data.frame(snp_to_gene)
+sigvariants$snp <- rownames(sigvariants)
+sigvariants <- as.data.frame(sigvariants[rownames(sigvariants) %in% unique(sigres$SNP),])
+colnames(sigvariants) <- c("gene of snp", "snp")
+write.csv(sigvariants, file = "results/sigvariants.csv", row.names = F)
+
 # Save variables
 save(list = c('res', 'sigres', 'regulatorygenes'), file = "results/volcano.Rda")
