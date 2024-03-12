@@ -18,15 +18,15 @@ gene_location_file_name <- "data/geneloc.txt"
 # Covariates file name. Set to character() for no covariates
 covariates_file_name <- character()
 # Output file name
-output_file_name_cis <- "results/cis-output_me.txt"
-output_file_name_tra <- "results/trans-output_me.txt"
+#output_file_name_cis <- "results/cis-output_me.txt"
+output_file_name <- "results/output_me.txt"
 # Only associations significant at this level will be saved
 pvOutputThreshold_cis <- 2e-2
-pvOutputThreshold_tra <- 1e-2
+pvOutputThreshold <- 1e-2
 # Error covariance matrix. Set to numeric() for identity.
 errorCovariance <- numeric()
 # Distance for local gene-SNP pairs
-cisDist <- 1e6 # Wihin 1 Megabase
+#cisDist <- 1e6 # Wihin 1 Megabase
 ## Load genotype data
 snps <- SlicedData$new()
 snps$fileDelimiter <- "\t" # the TAB character
@@ -54,28 +54,31 @@ me <- Matrix_eQTL_main(
   snps = snps,
   gene = gene,
   cvrt = cvrt,
-  output_file_name = output_file_name_tra,
-  pvOutputThreshold = pvOutputThreshold_tra,
+  output_file_name = output_file_name,
+  pvOutputThreshold = pvOutputThreshold,
   useModel = useModel,
   errorCovariance = errorCovariance,
   verbose = TRUE,
-  output_file_name.cis = output_file_name_cis,
-  pvOutputThreshold.cis = pvOutputThreshold_cis,
   snpspos = snpspos,
   genepos = genepos,
-  cisDist = cisDist,
   pvalue.hist = TRUE,
   min.pv.by.genesnp = FALSE,
   noFDRsaveMemory = FALSE
+  #cisDist = cisDist,
+  #output_file_name.cis = output_file_name_cis,
+  #pvOutputThreshold.cis = pvOutputThreshold_cis,
 )
 # unlink(output_file_name_tra)
 # unlink(output_file_name_cis)
 
 # Reading Matrix_EQTL results
-output_eqtl_cis <- read.table(file = "results/cis-output_me.txt", header = T)
-output_eqtl_trans <- read.table(file = "results/trans-output_me.txt", header = T)
-output_eqtl <- rbind(output_eqtl_cis,output_eqtl_trans)
+#output_eqtl_cis <- read.table(file = "results/cis-output_me.txt", header = T)
+#output_eqtl_trans <- read.table(file = "results/trans-output_me.txt", header = T)
+output_eqtl <- read.table(file = "results/output_me.txt", header = T)#rbind(output_eqtl_cis,output_eqtl_trans)
+
+# Print results
+print(paste(nrow(output_eqtl)," eQTLs"))
 
 ## Saving variables to .Rda
-save(list = c('output_eqtl', 'output_eqtl_cis', 'output_eqtl_trans'), file = "results/output_me.Rda")
+save(list = 'output_eqtl', file = "results/output_me.Rda")
 rm(list=ls())

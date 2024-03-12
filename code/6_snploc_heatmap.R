@@ -19,36 +19,6 @@ source(file = "code/functions.R")
 # 3. For a data frame of chromosomes and genomic location, returns a vector of associated genomic region
 # 4. For a vector of genomic regions, tallys frequency of each genomic region
 
-# 1.
-relatedSNP <- function(genes) {
-  sapply(genes, function(x){
-    output_eqtl[output_eqtl$gene==x, 1]
-  })
-}
-
-# 2.
-positionSNP <- function(snps) {
-  positions <- snpsloc[snpsloc$snpid %in% snps,]
-}
-
-# 3.
-regionsdata <- read.table(file="data/genomic_regions.txt")
-loci2region <- function(loci_df) {
-  # Loop over each locus in loci_df and find the corresponding MbRegion from chromosome_regions
-  region <- as.integer(sapply(1:nrow(loci_df), function(idx) {
-    # Extract the current locus chromosome and position
-    current_chr <- loci_df$chr[idx]
-    current_pos <- loci_df$pos[idx]
-
-    # Find the corresponding MbRegion
-    mb_region <- regionsdata$MbRegionLabel[regionsdata$Chromosome == current_chr &
-                                                  regionsdata$RegionStart <= current_pos &
-                                                  (regionsdata$RegionStart + 1e6 - 1) >= current_pos]
-    return(mb_region)
-  }))
-  return(region)
-}
-
 ## Constructing adjacency matrix
 genelist <- unique(sigres$gene)
 
@@ -73,7 +43,6 @@ generegions <- genepos %>%
   mutate(region = loci2region(genepos)) %>%
   select(geneid, region) %>%
   rename(gene = geneid)
-
 
 tally_matrix <- matrix(
   data = 0,

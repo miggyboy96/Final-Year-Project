@@ -4,20 +4,18 @@
 ## cluster analysis of eQTL results
 
 ## Load packages
-library(readxl) # Reading excel spreadsheets .xlsx
-library(dplyr)  # Data manipulation tools.
-library(pheatmap) # Heatmap vizualisation.
-library(viridis)  # Heatmap visualization, colors.
+library(tidyverse)
+library(ComplexHeatmap)
+library(circlize)
 library(RColorBrewer) # Heatmap colours
 
 ## Loading data
 load(file = 'data/processed_data.Rda')
-load(file = 'results/output_me.Rda')
 load(file = 'results/volcano.Rda')
 
 # List of variants and genes
-snplist <- unique(sigres$SNP)
-genelist <- unique(sigres$gene)
+snplist <- sigvariants
+genelist <- sig_genes
 
 ## Constructing an adjacency matrix
 adj_mat <- matrix(
@@ -32,19 +30,36 @@ for (i in seq(nrow(sigres))){
   adj_mat[gene,snp] <- pi
 }
 
+# Column adjustments
+filtered_snps <- names(sort(table(sigres$SNP), decreasing = T)[1:100])
+adj_mat <- adj_mat[,filtered_snps]
+colnames(adj_mat) <- mapply(paste0,colnames(adj_mat),rep(" (",length(colnames(adj_mat))),snp_to_gene[colnames(adj_mat)],rep(")",length(colnames(adj_mat))))
+
 ## Color palette
-cool <- rainbow(50, start=rgb2hsv(col2rgb('cyan'))[1], end=rgb2hsv(col2rgb('blue'))[1])
-warm <- rainbow(50, start=rgb2hsv(col2rgb('red'))[1], end=rgb2hsv(col2rgb('yellow'))[1])
-cols <- c(rev(cool), "snow2", "snow2", rev(warm))
-mypalette <- colorRampPalette(cols)(255)
+col_fun <- colorRamp2(c(min(adj_mat, na.rm = T), -0.5, 0, 0.5, max(adj_mat, na.rm = T)),
+                      c("blue", "cyan", "snow3", "yellow","red")
+)
 
 ## Printing the heatmap
-xlabel <- mapply(paste,colnames(adj_mat),rep("(",length(colnames(adj_mat))),snp_to_gene[colnames(adj_mat)],rep(")",length(colnames(adj_mat))))
-grn_effect_pheatmap <- pheatmap(mat = adj_mat, labels_col = xlabel, color = mypalette)
+Heatmap(mat = adj_mat,
+        name = "log2FC",
+        col = col_fun,
+        rect_gp = gpar(col = "white", lwd = 0.1),
+        row_title = "Regulatory genes",
+        row_title_side = "left",
+        row_names_side = "left",
+        column_title = "Variants",
+        column_title_side = "top",
+        show_column_names = F
+)
+                  # labels_col = NULL,
+                  # show_colnames = F,
+                  # col = mypalette,
+                  # breaks = c(bk1,0,bk2))
 
 ## Reordering snps and genes based on heatmap
 sigvariants <- colnames(adj_mat[,grn_effect_pheatmap$tree_col[["order"]]])
-regulatorygenes <- rownames(adj_mat[grn_effect_pheatmap$tree_row[['order']],])
+sig_genes <- rownames(adj_mat[grn_effect_pheatmap$tree_row[['order']],])
 
 ## Extract variant and gene clusters based on height of heirarchy
 plot(grn_effect_pheatmap$tree_col, main = 'Variant Cluster Dendrogram')
@@ -57,20 +72,22 @@ gene_clusters <- sort(cutree(grn_effect_pheatmap$tree_row, h=40))
 gene_cluster_dendrogram <- recordPlot()
 
 ## Write snp and gene lists to .csv files
-for (x in 1:max(snp_clusters)){
-  snpid <- names(which(snp_clusters==x)) # Creates a vector list of snps in cluster x
-  geneid <- snp_to_gene[snpid]
-  filename <- paste0("results/clusters/snp_cluster_",x,".csv")
-  write.csv(cbind(snpid,geneid),file = filename, row.names = F)
-}
-for (y in 1:max(gene_clusters)){
-  geneid <- names(which(gene_clusters==y))
-  filename <- paste0('results/clusters/gene_cluster_',y,'.csv')
-  write.csv(geneid, file = filename, row.names = F)
-}
+# for (x in 1:max(snp_clusters)){
+#   snpid <- names(which(snp_clusters==x)) # Creates a vector list of snps in cluster x
+#   geneid <- snp_to_gene[snpid]
+#   filename <- paste0("results/clusters/snp_cluster_",x,".csv")
+#   write.csv(cbind(snpid,geneid),file = filename, row.names = F)
+# }
+# for (y in 1:max(gene_clusters)){
+#   geneid <- names(which(gene_clusters==y))
+#   filename <- paste0('results/clusters/gene_cluster_',y,'.csv')
+#   write.csv(geneid, file = filename, row.names = F)
+# }
+
+# Print results
+
 
 ## Saving variables
 save(list = c('gene_clusters', 'snp_clusters', 'grn_effect_pheatmap', 'gene_cluster_dendrogram', 'snp_cluster_dendrogram'),
      file = 'results/clusters/output_cluster.Rda')
-
-
+rm(list=ls())

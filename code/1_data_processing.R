@@ -4,23 +4,26 @@
 # Processing raw data from the supplementary materials into forms suitable for analyses.
 
 ## Load packages
-library(readr)  # For reading data
-library(readxl)
-library(dplyr)  # For data manipulation
+library(tidyverse)
+source(file = 'code/functions.R')
 
 ### Importing raw data
 ## Expression and variant data. media-11.txt and media-12.txt downloaded from: https://www.biorxiv.org/content/10.1101/2023.09.11.557157v1.supplementary-material
 S11 <- read_tsv(file = "data/raw/media-11.txt", skip = 8, show_col_types = F)
 S12 <- readxl::read_excel(path = "data/raw/media-12.xlsx", sheet = "TPM filtered", .name_repair = "minimal")
+GRN <- read_excel(path = 'data/raw/media-10.xlsx')
 
 ## Arabidopsis gene assembly data
-tair10_gff <- read.table(url(description = "https://arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_gff3/TAIR10_GFF3_genes.gff"), sep = "")
+#tair10_gff <- read.table(url(description = "https://arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_gff3/TAIR10_GFF3_genes.gff"), sep = "")
+
+## Regulatory Genes
+regulatorygenes <- unique(GRN$`regulatory gene`)
 
 ## Gene expression data
 expr <- S12
 colnames(expr)[1] <- "geneid"
-geneid <- unlist(expr[,1],use.names = F)
-sampleid <- colnames(expr)[-1]
+geneids <- expr$geneid
+sampleids <- colnames(expr)[-1]
 
 ## Arabidopsis genome annotation
 geneloc <- tair10_gff %>% # Select and rename columns
@@ -39,17 +42,19 @@ geneloc <- geneloc[c("geneid", "chr", "left", "right")]
 geneloc$geneid <- as.character(geneloc$geneid)
 
 ## Variant genotype data
-snpid <- paste0("snp_", 1:nrow(S11))
+snpids <- paste0("snp_", seq_len(nrow(S11)))
 snpsloc <- data.frame(
-  snpid = snpid,
+  snpid = snpids,
   chr = S11$`#CHROM`,
   pos = S11$POS
 )
-gt <- S11 %>% select(-one_of(c("#CHROM","FILTER", "INFO", "FORMAT" ,"POS", "QUAL", "ID", "REF", "ALT")))
-gt <- cbind(snpid, gt)
+gt <- S11 %>%
+  select(-one_of(c("#CHROM","FILTER", "INFO", "FORMAT" ,"POS", "QUAL", "ID", "REF", "ALT"))) %>%
+  mutate(snpid = snpids, .before = 1)
 
 # Conversion to 0,1,2 form
-for (i in 1:nrow(gt)){
+gt <- as.data.frame(gt)
+for (i in seq_len(nrow(gt))){
   for (j in 2:ncol(gt)){
     if (gt[i,j] == "0|0"){
       gt[i,j] <- 0
@@ -64,24 +69,30 @@ for (i in 1:nrow(gt)){
 }
 gt[,-1] <- as.data.frame(sapply(gt[,-1], as.numeric))
 
-# Removing snps heterozygous across nearly all samples
-threshold <- length(sampleid) - 2  # if heterozygous in all but 2 samples
-gt <- gt[-which(rowSums(gt[, -1] == 1) > threshold),]
+# Calculating minor allele frequency
+maf <- sapply(snpids, function(snp){
+  calculateMAF(gt[gt$snpid == snp, -1])
+})
+#min(maf) # = 0.0538
+
+# Filtering SNPs based on occurances of 0,1,2
+#threshold <- length(sampleids) - 2  # if heterozygous in all but 2 samples
+#gt <- gt[-which(rowSums(gt[, -1] == 1) > threshold),]
 
 ## Creating a conversion table between snp and geneid
 source('code/functions.R')
 snp_to_gene <- mapply(pos.to.gene, snpsloc$pos, snpsloc$chr)
 names(snp_to_gene) <- snpsloc$snpid
 
-## Transposed versions of data frames
-gt_trans <- as.data.frame(t(gt[,-1]))
-colnames(gt_trans) <- gt$snpid
-expr_trans <- as.data.frame(t(expr[,-1]))
-colnames(expr_trans) <- expr$geneid
+# Print results
+print(paste(length(snpids),"variants/SNPs"))
+print(paste(length(sampleids),"samples"))
+print(paste(length(geneids),"genes"))
 
 ## Saving and writing data
-variables <- unique(c('variables','gt', 'gt_trans', 'expr', 'expr_trans', 'snpid', 'geneid', 'sampleid', 'geneloc', 'snpsloc','snp_to_gene'))
+variables <- unique(c('gt', 'expr', 'regulatorygenes', 'snpids', 'geneids', 'sampleids', 'geneloc', 'snpsloc','snp_to_gene'))
 save(list=variables, file = "data/processed_data.Rda")
 for (x in variables){
   write.table(get(x),file = paste0("data/",x,".txt"), sep = "\t", row.names = F)
 }
+rm(list=ls())
