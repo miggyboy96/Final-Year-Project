@@ -186,6 +186,7 @@ myManhattan <- function(df, graph.title = "", highlight = NULL, highlight.col = 
   return(g)
 }
 
+# Derives the chromosome for a given Mb region label
 getChromosome <- function(region) {
   if (region >= 1 && region <= 31) {
     1
@@ -200,4 +201,49 @@ getChromosome <- function(region) {
   } else {
     NA  # For regions outside the specified range
   }
+}
+
+regionsdata <- read.table(file="data/genomic_regions.txt")
+# Converts chromosome position to its respective Mb region label
+loci2region <- function(loci_df) {
+  # Loop over each locus in loci_df and find the corresponding MbRegion from chromosome_regions
+  region <- as.integer(sapply(1:nrow(loci_df), function(idx) {
+    # Extract the current locus chromosome and position
+    current_chr <- loci_df$chr[idx]
+    current_pos <- loci_df$pos[idx]
+
+    # Find the corresponding MbRegion
+    mb_region <- regionsdata$MbRegionLabel[regionsdata$Chromosome == current_chr &
+                                                  regionsdata$RegionStart <= current_pos &
+                                                  (regionsdata$RegionStart + 1e6 - 1) >= current_pos]
+    return(mb_region)
+  }))
+  return(region)
+}
+
+# Obtains a subset of snpsloc that detail, chromosome and position of given SNPs
+positionSNP <- function(snps) {
+  positions <- snpsloc[snpsloc$snpid %in% snps,]
+}
+
+# Derives set/s of SNPs that are significantly associated with the given gene/s
+relatedSNP <- function(genes) {
+  sapply(genes, function(x){
+    output_eqtl[output_eqtl$gene==x, 1]
+  })
+}
+
+# Calculate minor allele frequency of a genotype data of 0,1 and 2
+calculateMAF <- function(genotypes) {
+  # Count the number of occurrences of each allele
+  # 0 - homozygous for reference allele, 1 - heterozygous, 2 - homozygous for alternate allele
+  num_ref_alleles <- 2 * sum(genotypes == 0) + sum(genotypes == 1)
+  num_alt_alleles <- 2 * sum(genotypes == 2) + sum(genotypes == 1)
+
+  # Total number of alleles
+  total_alleles <- num_ref_alleles + num_alt_alleles
+
+  # MAF is the frequency of the less common allele
+  maf <- min(num_ref_alleles, num_alt_alleles) / total_alleles
+  return(maf)
 }

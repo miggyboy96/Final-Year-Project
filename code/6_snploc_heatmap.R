@@ -9,7 +9,7 @@ library(tidyverse)
 # Load Data
 load(file = "results/output_me.Rda")
 load(file = "data/processed_data.Rda")
-load(file = "results/volcano.Rda")
+#load(file = "results/volcano.Rda")
 source(file = "code/functions.R")
 
 # gene | Mb region | frequency
@@ -30,7 +30,7 @@ tallydata <- sapply(genelist, function(x){
   return(tallys)
 })
 
-control_genome <- table(loci2region(positionSNP(snpid)))
+control_genome <- table(loci2region(positionSNP(snpids)))
 control_genome <- control_genome * (mean(sapply(tallydata,mean)) / mean(control_genome)) * 1.1 # Rescale
 tallydata$'Genome (Normalised)' <- control_genome
 

@@ -12,17 +12,8 @@ load(file = 'data/processed_data.Rda')
 load(file = 'results/output_me.Rda')
 source(file = 'code/functions.R')
 
-## Gene selection
-res <- output_eqtl %>%
-  filter(gene %in% regulatorygenes) %>%
-  select(SNP, gene, FDR) %>%  # Adjust these column names as per your data frame
-  rowwise() %>%
-  mutate(log2FC = calclog2FC(SNP,gene)) %>%
-  mutate(pi = -1 * log10(FDR) * calclog2FC(SNP,gene)) %>%
-  ungroup()
-
 # Volcano Plot
-EnhancedVolcano(res,
+p.volcano <-EnhancedVolcano(res,
   lab = res$SNP,
   x = 'log2FC',
   y = 'FDR',
@@ -47,5 +38,5 @@ print(paste(length(unique(sigres$SNP)),"significant variants")) # 58 variants
 print(paste(length(unique(sigres$gene)),"differentially expressed regulators")) # 19 variants
 
 # Save variables
-save(list = c('res', 'sigres', 'sigvariants', 'sig_genes', 'snpgenes'), file = "results/volcano.Rda")
+save(list = c('sigres', 'sigvariants', 'sig_genes', 'snpgenes'), file = "results/volcano.Rda")
 rm(list=ls())

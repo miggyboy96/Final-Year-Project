@@ -1,4 +1,4 @@
-## 4_expression_heatmap.R
+## 3_expression_heatmap.R
 ## Miguel Alburo
 ## 20/02/2024
 ## cluster analysis of eQTL results

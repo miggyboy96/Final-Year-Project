@@ -5,16 +5,17 @@
 
 ## Load packages
 library(tidyverse)
+library(readxl)
 source(file = 'code/functions.R')
 
 ### Importing raw data
 ## Expression and variant data. media-11.txt and media-12.txt downloaded from: https://www.biorxiv.org/content/10.1101/2023.09.11.557157v1.supplementary-material
 S11 <- read_tsv(file = "data/raw/media-11.txt", skip = 8, show_col_types = F)
 S12 <- readxl::read_excel(path = "data/raw/media-12.xlsx", sheet = "TPM filtered", .name_repair = "minimal")
-GRN <- read_excel(path = 'data/raw/media-10.xlsx')
+GRN <- readxl::read_excel(path = 'data/raw/media-10.xlsx')
 
 ## Arabidopsis gene assembly data
-#tair10_gff <- read.table(url(description = "https://arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_gff3/TAIR10_GFF3_genes.gff"), sep = "")
+tair10_gff <- read.table(url(description = "https://arabidopsis.org/download_files/Genes/TAIR10_genome_release/TAIR10_gff3/TAIR10_GFF3_genes.gff"), sep = "")
 
 ## Regulatory Genes
 regulatorygenes <- unique(GRN$`regulatory gene`)
@@ -80,14 +81,14 @@ maf <- sapply(snpids, function(snp){
 #gt <- gt[-which(rowSums(gt[, -1] == 1) > threshold),]
 
 ## Creating a conversion table between snp and geneid
-source('code/functions.R')
 snp_to_gene <- mapply(pos.to.gene, snpsloc$pos, snpsloc$chr)
 names(snp_to_gene) <- snpsloc$snpid
 
 # Print results
-print(paste(length(snpids),"variants/SNPs"))
-print(paste(length(sampleids),"samples"))
-print(paste(length(geneids),"genes"))
+print(paste(length(snpids),"variants/SNPs")) # no. variants
+print(paste(length(sampleids),"samples")) # no. samples
+print(paste(length(geneids),"genes")) # no. genes
+print(paste(length(regulatorygenes),"bolting-associated regulatory genes")) # no. regulatory genes
 
 ## Saving and writing data
 variables <- unique(c('gt', 'expr', 'regulatorygenes', 'snpids', 'geneids', 'sampleids', 'geneloc', 'snpsloc','snp_to_gene'))
