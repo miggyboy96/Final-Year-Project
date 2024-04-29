@@ -9,6 +9,7 @@ pos.to.gene <- function(pos, chr){
   }
 }
 
+## plots expression over genotype
 snp.vs.gene <- function(snps,genes){
   data_long <- data.frame(sample = character(), snp = character(), genotype = numeric(), gene = character(), expression = numeric())
   for (index in seq(length(snps))){
@@ -26,6 +27,7 @@ snp.vs.gene <- function(snps,genes){
     stat_cor(aes(group = 1,label =  paste(..p.label.., ..rr.label.., sep = "~~~~")))
 }
 
+## Calculates the effect size / log2FC of a given variant to the gene expression of a given gene
 calclog2FC <- function(snp, gene){
   # Extract expression values for the gene
   gene_expr <- expr[expr$geneid == gene, ]
@@ -47,6 +49,7 @@ calclog2FC <- function(snp, gene){
   return(log2fc)
 }
 
+## Plots a manhattan plot
 myManhattan <- function(df, graph.title = "", highlight = NULL, highlight.col = "green",
                         col = c("lightblue", "navy"), even.facet = FALSE, chrom.lab = NULL,
                         suggestiveline = 1e-05, suggestivecolor = "blue",

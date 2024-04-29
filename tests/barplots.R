@@ -25,8 +25,18 @@ expr_long <- tidyr::gather(data = expr_trans, key = 'gene', value = 'expression'
 
 
 
-snps <- names(which(snp_clusters==4))
-genes <- names(which(gene_clusters==4))
-snp.vs.gene(c(snps[rep(1:4,each=2)],snps[1]),c(rep(genes[c(2,4)],4),genes[1]))
+snps <- c("snp_42", "snp_1841")
+genes <- sig_genes[1:5]
+snp.vs.gene(snps[rep(1:2,each=5)],genes[rep(1:5,2)])
 snp.vs.gene(snps[rep(1:4,each=4)],genes[rep(1:4, 4)])
 snp.vs.gene('snp1728', 'AT1G7880')
+
+snp_42_log2FC<- unlist(lapply(sig_genes, function(x){calclog2FC("snp_42",x)}))
+snp_1841_log2FC<- unlist(lapply(sig_genes, function(x){calclog2FC("snp_1841",x)}))
+df <- data.frame(x = seq(length(sig_genes)), snp_42 = snp_42_log2FC, snp_1841 = snp_1841_log2FC)
+
+ggplot(df, aes(x)) +                    # basic graphical object
+  geom_line(aes(y=snp_42), colour="red") +  # first layer
+  geom_line(aes(y=-snp_1841), colour="green")  # second layer
+plot(1:20, snp_42_log2FC)
+plot(1:20, -snp_1841_log2FC)

@@ -91,3 +91,22 @@ ggplot(tally_long, aes(x = region, y = gene, fill = count)) +
                      labels = 1:5) +
   theme_minimal() +
   labs(x = "Chromosome", y = "Regulatory Gene", fill = "SNP frequency")  # Adjust axis labels as needed
+
+
+### location matrix plot
+
+# location matrix
+location_matix <- output_eqtl %>%
+  mutate(log_fdr = - log(FDR, 10)) %>%
+  select(SNP, gene, log_fdr) %>%
+
+# position of ALL genes
+genepos <- geneloc %>%
+  select(-right) %>%
+  filter(geneid %in% genelist) %>%
+  rename(pos = left)
+generegions <- genepos %>%
+  mutate(region = loci2region(genepos)) %>%
+  select(geneid, region) %>%
+  rename(gene = geneid)
+

@@ -25,12 +25,14 @@ expr <- S12
 colnames(expr)[1] <- "geneid"
 geneids <- expr$geneid
 sampleids <- colnames(expr)[-1]
+write.table(expr,file = "data/expr.txt", sep = "\t", row.names = F)
 
 ## Arabidopsis genome annotation
 geneloc <- tair10_gff %>% # Select and rename columns
   filter(V3 == "gene") %>%
   select(Chr = V1, left = V4, right = V5, geneid = V9)
 geneloc$geneid <- sub(pattern = ".*Name=", replacement = "", geneloc$geneid) # Geneid substring from full string
+write.table(geneloc,file = "data/geneloc.txt", sep = "\t", row.names = F)
 
 # Manipulate chromosome data to use consistent naming
 conversion_table <- data.frame(
@@ -49,6 +51,7 @@ snpsloc <- data.frame(
   chr = S11$`#CHROM`,
   pos = S11$POS
 )
+write.table(snpsloc,file = "data/snpsloc.txt", sep = "\t", row.names = F)
 gt <- S11 %>%
   select(-one_of(c("#CHROM","FILTER", "INFO", "FORMAT" ,"POS", "QUAL", "ID", "REF", "ALT"))) %>%
   mutate(snpid = snpids, .before = 1)
@@ -69,6 +72,7 @@ for (i in seq_len(nrow(gt))){
   }
 }
 gt[,-1] <- as.data.frame(sapply(gt[,-1], as.numeric))
+write.table(gt,file = "data/gt.txt", sep = "\t", row.names = F)
 
 # Calculating minor allele frequency
 maf <- sapply(snpids, function(snp){
@@ -91,9 +95,7 @@ print(paste(length(geneids),"genes")) # no. genes
 print(paste(length(regulatorygenes),"bolting-associated regulatory genes")) # no. regulatory genes
 
 ## Saving and writing data
+
 variables <- unique(c('gt', 'expr', 'regulatorygenes', 'snpids', 'geneids', 'sampleids', 'geneloc', 'snpsloc','snp_to_gene'))
 save(list=variables, file = "data/processed_data.Rda")
-for (x in variables){
-  write.table(get(x),file = paste0("data/",x,".txt"), sep = "\t", row.names = F)
-}
 rm(list=ls())

@@ -131,15 +131,18 @@ EnhancedVolcano(
   labSize = 6.0
 )
 
+
+
 # Print results
 print(paste(sum(output_eqtl$FDR < 1e-5),"general eQTLs with FDR adjusted q<1e-5"))
 print(paste(length(unique(output_eqtl$SNP[output_eqtl$FDR< 1e-5])), "unique variants are linked to"))
-print(paste(length(unique(output_eqtl$gene[output_eqtl$FDR< 1e-5])), "unique regulatory genes affected"))
+print(paste(length(unique(output_eqtl$gene[output_eqtl$FDR< 1e-5])), "unique genes affected"))
 
 print(paste(nrow(res[res$FDR< 1e-5,]),"bolting-regulator linked significant eQTLs with q<1e-5 and log2FC >1/<-1"))
 print(paste(length(sigvariants), "unique subset of significant variants are linked to"))
 print(paste(length(sig_genes), "unique affected bolting-related regulatory genes"))
 
+
 ## Saving variables to .Rda
-save(list = 'output_eqtl', 'res', "sigres", "sig_genes", "sigvariants", file = "results/output_me.Rda")
+save(list = 'output_eqtl', 'res', "sigres", "sig_genes", "sigvariants", "tophits", file = "results/output_me.Rda")
 rm(list=ls())
