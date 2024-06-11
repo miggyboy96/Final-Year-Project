@@ -1,2 +1,0 @@
-"query" "significant" "p_value" "term_size" "query_size" "intersection_size" "precision" "recall" "term_id" "source" "term_name" "effective_domain_size" "source_order" "parents"
-"1" "query_1" TRUE 0.0398658001253236 2890 43 16 0.372093023255814 0.0055363321799308 "GO:0051716" "GO:BP" "cellular response to stimulus" 21899 14364 

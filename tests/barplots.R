@@ -3,14 +3,21 @@
 #
 
 ## Packages
-library(tidyr)
-library(ggplot2)
-library(ggpubr)
+library(tidyverse)
 
 ## Datasets
 load(file = 'data/processed_data.Rda')
-source(file =  'code/functions.R')
+source(file = 'code/1_functions.R')
 
+
+genotype.expression <- function(snp, gene){
+  genotype <- filter(gt, snpid == snp) %>%
+    select(-snpid)
+  expression <- filter(expr, geneid == gene) %>%
+    select(-geneid)
+  combined <- t(full_join(genotype,expression, by = colnames(genotype)))
+  colnames(combined) <- c("genotype", "expression")
+  return(combined)}
 ## Transposed versions of datasets
 gt_trans <- data.frame(t(gt[,-1]))
 colnames(gt_trans) <- t(gt[,1])

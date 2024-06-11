@@ -5,10 +5,10 @@
 
 ## Packages and data
 library(tidyverse)
+source(file = "code/1_functions.R")
 library("MatrixEQTL") # http://www.bios.unc.edu/research/genomic_software/Matrix_eQTL/
 library(EnhancedVolcano)
 library(ggsci)
-source(file = "code/functions.R")
 load(file = "data/processed_data.Rda")
 
 ## Preparing for analysis
@@ -81,68 +81,36 @@ me <- Matrix_eQTL_main(
 #output_eqtl_trans <- read.table(file = "results/trans-output_me.txt", header = T)
 output_eqtl <- read.table(file = "results/output_me.txt", header = T) #rbind(output_eqtl_cis,output_eqtl_trans)
 
-# Filtering based on regulatory genes
-res <- output_eqtl %>%
-  filter(gene %in% regulatorygenes) %>%
-  select(SNP, gene, FDR) %>%  # Adjust these column names as per your data frame
+df <- output_eqtl %>%
+  select(SNP, gene, FDR) %>%
+  arrange(FDR) %>%
+  filter(!duplicated(SNP)) %>%
   rowwise() %>%
   mutate(log2FC = calclog2FC(SNP,gene)) %>%
-  mutate(pi = -1 * log10(FDR) * calclog2FC(SNP,gene)) %>%
-  ungroup() %>%
-  arrange(desc(abs(pi)))
+  ungroup()
 
-## Filtering based on FDR and effect size
-sigres <- res %>% filter(FDR<1e-5, (log2FC > 1 | log2FC < -1))
-sigvariants <- unique(sigres$SNP)
-sig_genes <- unique(sigres$gene)
-
-# X-label
-xlabel <- res$SNP
-xlabel[duplicated(xlabel)] <- seq(1,sum(duplicated(xlabel)))
-
-## Colours
-#genetally <- count(sigres,gene,sort = T)
-colour_key <- setNames(pal_ucscgb()(length(sig_genes)), sig_genes)
-genecolours <- (colour_key[res$gene])
-genecolours[is.na(genecolours)]  <- "gray30"
-names(genecolours)[is.na(genecolours)] <- "NS"
-
-# genecolours[which(! (res$gene %in% sig_genes))] <- "black"
-# names(genecolours)[which(! (res$gene %in% sig_genes))] <- "p-value and log2FC"
-# genecolours[which(res$FDR<1e-5 & (res$log2FC < 1 & res$log2FC > -1))] <- "gray30" #"royalblue"
-# names(genecolours)[which(res$FDR<1e-5 & (res$log2FC < 1 & res$log2FC > -1))] <- "p-value"
-# genecolours[which(res$FDR>1e-5 & (res$log2FC > 1 | res$log2FC < -1))] <- "gray30" # "forestgreen"
-# names(genecolours)[which(res$FDR>1e-5 & (res$log2FC < 1 | res$log2FC > -1))] <- "log2FC"
-# genecolours[which(res$FDR>1e-5 & (res$log2FC < 1 & res$log2FC > -1))] <- "gray30"
-# names(genecolours)[which(res$FDR>1e-5 & (res$log2FC < 1 & res$log2FC > -1))] <- "NS"
-
-# Draw Volcano plot
-EnhancedVolcano(
-  res,
-  lab = xlabel,
-  selectLab = unique(res$SNP[res$FDR < 1e-5]),
+p.volcano.all <- EnhancedVolcano(
+  df,
+  lab = df$SNP,
+  selectLab = df$SNP[1:10],
   x = 'log2FC',
+  xlim = c(-10,10),
+  ylim = c(0,40),
   y = 'FDR',
   title = 'MatrixEQTL results',
-  colCustom = genecolours,
+  legendLabSize = 8,
+  legendIconSize = 3.0,
   pCutoff = 1e-5,
   FCcutoff = 1,
-  pointSize = 3.5,
-  labSize = 6.0
+  pointSize = 2.0,
+  labSize = 4.0
 )
-
-
-
+print(p.volcano.all)
+ggsave(p.volcano.all, file ="results/plots/volcanoplot_all.pdf", width=190, height=150, units = "mm", dpi=300)
 # Print results
 print(paste(sum(output_eqtl$FDR < 1e-5),"general eQTLs with FDR adjusted q<1e-5"))
 print(paste(length(unique(output_eqtl$SNP[output_eqtl$FDR< 1e-5])), "unique variants are linked to"))
 print(paste(length(unique(output_eqtl$gene[output_eqtl$FDR< 1e-5])), "unique genes affected"))
 
-print(paste(nrow(res[res$FDR< 1e-5,]),"bolting-regulator linked significant eQTLs with q<1e-5 and log2FC >1/<-1"))
-print(paste(length(sigvariants), "unique subset of significant variants are linked to"))
-print(paste(length(sig_genes), "unique affected bolting-related regulatory genes"))
 
-
-## Saving variables to .Rda
-save(list = 'output_eqtl', 'res', "sigres", "sig_genes", "sigvariants", "tophits", file = "results/output_me.Rda")
 rm(list=ls())

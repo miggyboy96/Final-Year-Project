@@ -1,0 +1,54 @@
+.sm {  font-family:arial,helvetica,sans-serif;font-size:9pt}
+.fixed {  font-family: "Courier New", Courier, mono}
+th {  font-family: arial, helvetica, sans-serif; font-size:10pt}
+p  {  font-family: arial, helvetica, sans-serif; font-size:10pt}
+
+#gene-search-results .row-odd {
+	background: #ffffff;
+}
+
+#gene-search-results .row-even {
+	background: #f1efec;
+}
+
+#gene-search-results .result-cell {
+	padding-top: 1.2em;
+	padding-bottom: 1.2em;
+	padding-right: 1.2em;
+}
+
+#gene-search-results .result-cell .result-description {
+	margin-top: 0.6em;
+	position: relative;
+	max-height: 3.6em;
+	line-height: 1.2em;
+	overflow: hidden;
+}
+
+#gene-search-results .result-cell .result-description:after {
+	content: "";
+	text-align: right;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	width: 70%;
+	height: 1.2em;
+}
+
+#gene-search-results .row-odd .result-description:after {
+	background: linear-gradient(to right, rgba(255, 255, 255, 0) 25%, rgba(255, 255, 255, 1) 75%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00ffffff', endColorstr='#ffffff',GradientType=1 );
+}
+
+#gene-search-results .row-even .result-description:after {
+	background: linear-gradient(to right, rgba(241, 239, 236, 0) 25%, rgba(241, 239, 236, 1) 75%);
+	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#00f1efec', endColorstr='#f1efec',GradientType=1 );
+}
+
+#gene-search-results .result-index {
+	width: 5em;
+}
+
+#gene-search-results .result-index-checkbox {
+	margin-top: 0;
+}

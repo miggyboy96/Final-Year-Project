@@ -38,3 +38,22 @@ for (edge in seq_len(nrow(subsetmeLong))){
 }
 
 pheatmap(t(adjacencyMatrix), color = inferno(60))
+
+
+library(igraph)
+GRN <- readxl::read_excel(path = 'data/raw/media-10.xlsx')
+p.grn <- graph_from_data_frame(GRN, directed = TRUE)
+plot(p.grn,
+     vertex.size = 20,               # Controls the size of the nodes
+     vertex.label = NULL,  # Node labels
+     vertex.label.cex = 0.8,         # Font size for node labels
+     vertex.color = "skyblue",       # Node color
+     edge.arrow.size = 0.5,          # Arrow size
+     edge.curved = 0.1,              # Edge curvature
+     main = "Gene Regulatory Network")  # Title of the plot
+
+ethansGO <- readxl::read_excel(path = 'data/raw/media-2.xlsx') %>%
+  select(source, term_name, term_id, term_size, p_values_up, p_values_down) %>%
+  group_by(source)
+
+bplist <- ethansGO
